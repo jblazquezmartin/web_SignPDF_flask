@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulario de Captura de Firma</title>
+    <!-- Agrega el enlace a la biblioteca SignaturePad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad"></script>
+</head>
+<body>
+    <h1>Formulario de Captura de Firma</h1>
+    <form method="POST" action="/captura_firma" enctype="multipart/form-data">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+        
+        <label for="apellidos">Apellidos:</label>
+        <input type="text" id="apellidos" name="apellidos" required><br><br>
+        
+        <label for="dni">DNI:</label>
+        <input type="text" id="dni" name="dni" required><br><br>
+
+        <!-- Agrega un div para contener la firma -->
+        <div id="firmaContainer">
+            <label for="firma">Firma:</label>
+            <canvas id="firmaCanvas" width="400" height="200"></canvas>
+            <button type="button" id="borrarFirma">Borrar Firma</button><br><br>
+        </div>
+
+        <input type="hidden" id="firma_base64" name="firma_base64" value=""><br><br>
+
+        <button type="submit">Guardar Firma</button>
+    </form>
+
+    <script>
+        // JavaScript para la captura de la firma con SignaturePad
+        const canvas = document.getElementById('firmaCanvas');
+        const firmaBase64Input = document.getElementById('firma_base64');
+        const clearButton = document.getElementById('borrarFirma');
+
+        const signaturePad = new SignaturePad(canvas);
+
+        clearButton.addEventListener('click', () => {
+            signaturePad.clear();
+            firmaBase64Input.value = ''; // Borra la firma del input oculto
+        });
+
+        // Agrega un evento al formulario para guardar la firma antes de enviarlo
+        document.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!signaturePad.isEmpty()) {
+                // Si hay una firma, conviértela en Base64 y guárdala en el input oculto
+                const firmaBase64 = signaturePad.toDataURL().split(',')[1];
+                firmaBase64Input.value = firmaBase64;
+                // Ahora puedes enviar el formulario
+                document.querySelector('form').submit();
+            } else {
+                alert('Por favor, firma antes de enviar el formulario.');
+            }
+        });
+    </script>
+</body>
+</html>
